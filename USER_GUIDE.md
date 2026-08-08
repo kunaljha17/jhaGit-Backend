@@ -1,420 +1,405 @@
-# jhaGit Web Platform & CLI — User Guide & Demonstration Manual
+# ⚙️ jhaGit Backend — Comprehensive User Guide & Developer Manual
 
-Welcome to **jhaGit**, a full-stack, GitHub-inspired version control platform, CLI tool, and web application. This guide provides step-by-step instructions on how to use all features of the web platform and CLI engine, including explicit details on how `git init`, `git push`, `git pull`, and object restoration work.
-
----
-
-## Table of Contents
-
-1. [Prerequisites & Accessing the Web Application](#1-prerequisites--accessing-the-web-application)
-2. [Step 1: Account Registration (Signup)](#step-1-account-registration-signup)
-3. [Step 2: Sign In (Login)](#step-2-sign-in-login)
-4. [Step 3: Navigating the Dashboard](#step-3-navigating-the-dashboard)
-5. [Step 4: Creating a New Repository](#step-4-creating-a-new-repository)
-6. [Step 5: File Explorer & In-Browser File Creation](#step-5-file-explorer--in-browser-file-creation)
-7. [Step 6: Git Engine Commands — `init`, `push`, `pull` Explained](#step-6-git-engine-commands--init-push-pull-explained)
-   - 7.1 [How `git init` Works](#71-how-git-init-works)
-   - 7.2 [How `git push` Works](#72-how-git-push-works)
-   - 7.3 [What Happens When `git pull` Is Used (File Destinations & Code Restoration)](#73-what-happens-when-git-pull-is-used-file-destinations--code-restoration)
-   - 7.4 [Web Control Panel vs Terminal CLI Workflow](#74-web-control-panel-vs-terminal-cli-workflow)
-8. [Step 7: Full CLI Terminal Command Examples](#step-7-full-cli-terminal-command-examples)
-9. [Step 8: Issue Tracking](#step-8-issue-tracking)
-10. [Step 9: Starring Repositories](#step-9-starring-repositories)
-11. [Step 10: User Profile & Contribution Heatmap](#step-10-user-profile--contribution-heatmap)
-12. [Step 11: Repository Deletion (Owner Settings)](#step-11-repository-deletion-owner-settings)
-13. [Step 12: Info Pages & Footer Navigation](#step-12-info-pages--footer-navigation)
+Welcome to the official **Backend User Guide** for **jhaGit**. This document provides an exhaustive, step-by-step technical guide for configuring, running, testing, and integrating with the jhaGit backend system.
 
 ---
 
-## 1. Prerequisites & Accessing the Web Application
+## 📋 Table of Contents
 
-Before starting, ensure both the backend server and frontend development server are running:
-
-- **Backend Server**: Starts on `http://localhost:3002` (via `node index.js start`)
-- **Frontend App**: Starts on `http://localhost:5173` (via `npm run dev`)
-
-Open your browser and navigate to `http://localhost:5173`. If you are not signed in, you will be automatically directed to the login page (`/auth`).
-
----
-
-## Step 1: Account Registration (Signup)
-
-If you do not have an account, click **"Create an account"** at the bottom of the sign-in box or navigate to `http://localhost:5173/signup`.
-
-### Example Registration Credentials:
-| Field | Example Value |
-| :--- | :--- |
-| **Username** | `kunal_tester` |
-| **Email address** | `kunal_tester@example.com` |
-| **Password** | `SecurePass123!` |
-
-1. Fill in the **Username**, **Email address**, and **Password** fields.
-2. Click the green **"Sign up"** button.
-3. Upon success, jhaGit generates a JWT authentication token, saves it securely in `localStorage`, and automatically logs you in to the **Dashboard** (`/`).
+1. [System Architecture Overview](#1-system-architecture-overview)
+2. [Prerequisites & Environment Setup](#2-prerequisites--environment-setup)
+3. [Quick Start Guide](#3-quick-start-guide)
+4. [Authentication & OTP Verification Flow](#4-authentication--otp-verification-flow)
+5. [REST API Endpoint Reference](#5-rest-api-endpoint-reference)
+   - [User Management & Authentication](#51-user-management--authentication)
+   - [Repository & File Management](#52-repository--file-management)
+   - [Starring & Heatmap Activity](#53-starring--heatmap-activity)
+   - [Issue Tracking](#54-issue-tracking)
+   - [RESTful Git Engine Endpoints](#55-restful-git-engine-endpoints)
+6. [CLI Engine Command Reference](#6-cli-engine-command-reference)
+7. [Git Engine Internals & Cloud Sync](#7-git-engine-internals--cloud-sync)
+8. [WebSocket Protocol (Socket.IO)](#8-websocket-protocol-socketio)
+9. [Database Schemas & Data Models](#9-database-schemas--data-models)
+10. [Test Suite Execution](#10-test-suite-execution)
+11. [Troubleshooting & FAQs](#11-troubleshooting--faqs)
 
 ---
 
-## Step 2: Sign In (Login)
+## 1. System Architecture Overview
 
-If you already have an account:
+The **jhaGit backend** is a hybrid Node.js application that serves two primary roles:
 
-1. Go to `http://localhost:5173/auth`.
-2. Enter your credentials:
-   - **Email address**: `kunal_tester@example.com`
-   - **Password**: `SecurePass123!`
-3. Click **"Sign in"**.
-4. You will be redirected to your dashboard with all your repositories loaded.
-
----
-
-## Step 3: Navigating the Dashboard
-
-The Dashboard (`/`) is your central hub for project management.
-
-### Features on the Dashboard:
-- **Repository List**: Displays all repositories owned by you, complete with visibility tags (`Public` or `Private`), star count, description, and relative update times (e.g. *"Updated 5 min ago"*).
-- **Live Search Bar**:
-  - Type in the input box to instantly filter your repositories by name.
-  - **Keyboard Shortcut**: Press `Ctrl + K` (or `Cmd + K` on Mac) anywhere on the page to focus the search bar.
-  - Click the **✕** button to clear your search query.
-- **Sidebar**:
-  - **Suggested Repositories**: Displays public repositories created by other users. Clicking any suggested repository opens its detailed view.
-  - **Latest Activity**: Quick tips for exploring commits, branches, and issues.
-
----
-
-## Step 4: Creating a New Repository
-
-To create a new repository:
-
-1. Click the green **"+ New Repository"** button in the top Navbar or on the Dashboard header.
-2. Fill out the creation form using these example values:
-
-### Example Repository Details:
-| Field | Example Value | Notes |
-| :--- | :--- | :--- |
-| **Repository name** | `demo-web-app` | Required. URL slug will preview as `jhaGit.com/owner/demo-web-app` |
-| **Description** | `A full-stack demonstration repository on jhaGit platform` | Optional short description |
-| **Visibility** | `Public` (Selected) | Choose between **Public** (visible to all) or **Private** |
-
-3. Click **"Create repository"**.
-4. jhaGit will automatically initialize the repository in MongoDB, generate a default `README.md` file, and redirect you to the Repository Details page (`/repo/:id`).
-
----
-
-## Step 5: File Explorer & In-Browser File Creation
-
-Inside a repository (`/repo/:id`), click the **"Code"** tab to view files and project structure.
-
-### 1. Viewing Files
-- Click on any file in the **Repository Files** list (e.g., `README.md`).
-- The content preview box below displays the raw file text.
-- Click the **"📋 Copy"** button in the top-right corner of the file box to copy the file content to your clipboard (displays **"✓ Copied"** confirmation).
-
-### 2. Creating & Committing a New File Inline
-1. Click the **"+ Add File"** button above the file list.
-2. Fill in the inline commit form:
-
-#### Example New File 1:
-- **Filename**: `index.js`
-- **File Content**:
-  ```javascript
-  // jhaGit Web Application Entry Point
-  console.log("Welcome to jhaGit version control system!");
-  ```
-- Click **"Commit File"**.
-
-#### Example New File 2:
-- **Filename**: `config.json`
-- **File Content**:
-  ```json
-  {
-    "projectName": "demo-web-app",
-    "version": "1.0.0",
-    "environment": "production"
-  }
-  ```
-- Click **"Commit File"**.
-
-The file list and 12-month activity heatmap will update immediately.
-
----
-
-## Step 6: Git Engine Commands — `init`, `push`, `pull` Explained
-
-Inside the **Code** tab of any repository, you will find the **Git Engine Controls** panel with three command triggers: `$ git init`, `$ git push`, and `$ git pull`. Here is a detailed breakdown of how each command works under the hood and how to use them.
-
-### 7.1 How `git init` Works
-- **Purpose**: Initializes a new jhaGit version control repository on disk.
-- **Under the Hood**:
-  1. Creates the hidden `.jhaGit/` directory structure inside the repository folder.
-  2. Creates subdirectories `.jhaGit/commits/` (stores full file snapshots) and `.jhaGit/refs/heads/`.
-  3. Writes `.jhaGit/HEAD` file setting default branch pointer to `main`.
-  4. Creates `.jhaGit/refs/heads/main` reference file.
-  5. Generates `.jhaGit/config.json` containing Cloudflare R2 / S3 remote storage bucket configuration.
-- **How to Use**:
-  - **In Web UI**: Click the `$ git init` button under Git Engine Controls. A banner will confirm `Command 'git init' completed!`.
-  - **In Terminal**: Run `node index.js init`.
-
-### 7.2 How `git push` Works
-- **Purpose**: Uploads all local commits and file snapshots to Cloudflare R2 remote storage (S3-compatible bucket).
-- **Under the Hood**:
-  1. Scans the local `.jhaGit/commits/` directory for all commit snapshot folders.
-  2. Iterates over every file inside each commit directory (including `commit.json` metadata).
-  3. Uses AWS S3 SDK (`PutObjectCommand`) to stream files to Cloudflare R2 using the key format:
-     `commits/<commitUUID>/<filename>`
-  4. Ensures remote cloud storage matches local commit history.
-- **How to Use**:
-  - **In Web UI**: Click the `$ git push` button under Git Engine Controls. A banner will display `Command 'git push' completed!`.
-  - **In Terminal**: Run `node index.js push`. Output will log `All commits push to S3.`.
-
----
-
-### 7.3 What Happens When `git pull` Is Used (File Destinations & Code Restoration)
-
-When a user executes `git pull` (or `$ git pull` in Web UI / `clone`), here is the exact sequence of what happens, **where the files are pulled**, and **how actual code files end up in your working directory**:
+1. **REST & Real-Time HTTP/WebSocket Server**: Built with [Express v5](https://expressjs.com/), [Mongoose v9](https://mongoosejs.com/), and [Socket.IO](https://socket.io/), handling user management, authentication, repository metadata, issue tracking, and real-time client socket connections.
+2. **Version Control Engine (CLI)**: Driven by [Yargs](https://yargs.js.org/), implementing local git operations (`.jhaGit` workspace, DAG snapshot commits, LCS 3-way branch merging, R2 cloud storage push/pull).
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│             Cloudflare R2 Bucket Remote Storage             │
-│  Key: commits/a1b2c3d4-xxxx/index.js                         │
-│  Key: commits/a1b2c3d4-xxxx/README.md                        │
-│  Key: commits/a1b2c3d4-xxxx/commit.json                      │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               │ 1. ListObjectsV2Command & GetObjectCommand
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│          Local Repository Snapshot Storage (.jhaGit/)        │
-│  Path: .jhaGit/commits/a1b2c3d4-xxxx/index.js               │
-│  Path: .jhaGit/commits/a1b2c3d4-xxxx/README.md              │
-│  Path: .jhaGit/commits/a1b2c3d4-xxxx/commit.json            │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               │ 2. Code Restoration (revertRepo / checkout)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│            Actual Working Directory (Your Project)          │
-│  Path: ./index.js   <── (Copied from commit snapshot)        │
-│  Path: ./README.md  <── (Copied from commit snapshot)        │
-└─────────────────────────────────────────────────────────────┘
+                      +----------------------------------+
+                      |         User / Client            |
+                      +----------------------------------+
+                             /                  \
+              REST API / Socket.IO               CLI Commands
+                            /                    \
+                           v                      v
+             +-----------------------+   +-----------------------+
+             |   Express Web Server  |   |    Yargs CLI Engine   |
+             +-----------------------+   +-----------------------+
+                |         |        |           |          |
+                v         v        v           v          v
+          +----------+ +-----+ +-------+  +---------+  +---------+
+          | MongoDB  | | SMTP| |  R2   |  | .jhaGit |  | Cloud   |
+          | Database | | Mail| |Storage|  | Local   |  | R2 Sync |
+          +----------+ +-----+ +-------+  +---------+  +---------+
 ```
 
-#### Step-by-Step Pull Breakdown:
+---
 
-1. **Remote Key Inspection**:
-   - `pull.js` sends `ListObjectsV2Command` to Cloudflare R2 bucket with prefix `"commits/"`.
-   - It retrieves a list of all remote commit keys (e.g., `commits/a1b2c3d4-xxxx/index.js`, `commits/a1b2c3d4-xxxx/commit.json`).
+## 2. Prerequisites & Environment Setup
 
-2. **File Pull Destination (`.jhaGit/commits/`)**:
-   - For each object found, `pull.js` strips the `"commits/"` prefix and builds the local destination path:
-     `path.join(process.cwd(), ".jhaGit/commits", relativePath)`
-   - **Exact Disk Location**: `.jhaGit/commits/<commitUUID>/`
-   - It creates the folder if missing (`fs.mkdir(..., { recursive: true })`) and downloads the exact file bytes using `GetObjectCommand` + `fs.writeFile()`.
+### Required Dependencies
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
+- **MongoDB Database**: MongoDB Atlas URI or local instance (`mongodb://localhost:27017`)
+- **Cloud Storage**: Cloudflare R2 or AWS S3 bucket for remote commit object storage
+- **SMTP Server**: Gmail App Password or custom SMTP server for OTP verification emails
 
-3. **How Actual Code Files Reach Your Working Directory (`revertRepo`)**:
-   - Downloading files into `.jhaGit/commits/<UUID>/` updates the repository's historical snapshot database.
-   - To place the **actual code files** into your active working directory (e.g., `./index.js`, `./README.md`), `clone` or `checkout` calls `revertRepo(latestCommitID)`:
-     ```javascript
-     // revert.js loops through files in .jhaGit/commits/<latestCommitID>/
-     for (const file of files) {
-         if (file === "commit.json") continue; // Skip metadata
-         await fs.copyFile(
-             path.join(commitDir, file),       // Source: .jhaGit/commits/<id>/<file>
-             path.join(parentDir, file)        // Destination: ./<file> (Working Directory)
-         );
-     }
-     ```
-   - **Result**: Your actual working project directory is populated with the exact code files from the latest commit!
+### Environment Configuration (`.env`)
 
-4. **How the Web Dashboard Reflects Pulled Files**:
-   - When `$ git pull` completes in the browser, the web page re-fetches `GET /git/log` and repository details.
-   - The file list, code previewer, and commit timeline render the newly pulled files dynamically.
+Create a `.env` file inside the `backend/` directory:
+
+```env
+# Server Port
+PORT=3002
+
+# MongoDB Connection String
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/GithubClone?retryWrites=true&w=majority
+
+# JWT Authentication Secret
+JWT_SECRET=your_jwt_secret_key_here
+
+# Nodemailer / SMTP Credentials for OTP Emails
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_16_character_app_password
+
+# Cloudflare R2 / S3 Object Storage Config
+R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
+R2_ACCESS_KEY=<your_r2_access_key_id>
+R2_SECRET_KEY=<your_r2_secret_access_key>
+R2_BUCKET=<your_r2_bucket_name>
+```
 
 ---
 
-### 7.4 Web Control Panel vs Terminal CLI Workflow
+## 3. Quick Start Guide
 
-| Action | Web UI Trigger | Terminal Command | Backend API Endpoint | File Location on Disk |
-| :--- | :--- | :--- | :--- | :--- |
-| **Initialize Repo** | Click `$ git init` button | `node index.js init` | `POST /git/init` | `.jhaGit/`, `.jhaGit/HEAD`, `.jhaGit/config.json` |
-| **Push Commits** | Click `$ git push` button | `node index.js push` | `POST /git/push` | Uploads `.jhaGit/commits/` to Cloudflare R2 bucket |
-| **Pull Commits** | Click `$ git pull` button | `node index.js pull` | `POST /git/pull` | Downloads from R2 into `.jhaGit/commits/<UUID>/` |
-| **Restore Code** | View repo / switch branch | `node index.js checkout` | `POST /git/checkout` | Copies `.jhaGit/commits/<UUID>/<file>` ➔ `./<file>` |
-
----
-
-## Step 7: Full CLI Terminal Command Examples
-
-In addition to using the web dashboard, jhaGit provides a complete CLI interface using Node.js and Yargs. Open your terminal in the backend directory (`c:\Users\jhaku\Desktop\sigma\Major-project-2\backend`) to run commands:
-
-### 1. Initialize Repository
+### 1. Install Backend Dependencies
 ```bash
-$ node index.js init
-# Output: repository initialised!
+cd backend
+npm install
 ```
 
-### 2. Stage a File for Commit
+### 2. Start the REST API & WebSocket Server
+To start the HTTP server on port `3002` (or the `PORT` specified in `.env`):
 ```bash
-$ echo "console.log('Hello jhaGit CLI!');" > app.js
-$ node index.js add app.js
-# Output: File app.js added to staging area!
+node index.js start
 ```
 
-### 3. Commit Staged Files
+### 3. Run Version Control Commands via CLI
+The backend entry point also acts as a CLI parser:
 ```bash
-$ node index.js commit "Initial commit via CLI"
-# Output: Commit a1b2c3d4-xxxx-xxxx-xxxx created with message: Initial commit via CLI
-```
+# Initialize a local jhaGit repository
+node index.js init
 
-### 4. Check Working Directory Status
-```bash
-$ node index.js status
-# Output: On branch main, staged files: [], modified files: []
-```
+# Stage files
+node index.js add README.md
 
-### 5. View Commit History Log
-```bash
-$ node index.js log
-# Output: Displays list of commits, authors, dates, and parent commit UUIDs
-```
+# Create a commit snapshot
+node index.js commit "Initial commit"
 
-### 6. Create and Switch Branches
-```bash
-# Create new branch named 'feature-login'
-$ node index.js branch feature-login
-
-# Switch to 'feature-login' branch
-$ node index.js checkout feature-login
-# Output: Switched to branch 'feature-login'
-```
-
-### 7. Merge Branches (3-Way Merge Engine)
-```bash
-# Switch to main branch
-$ node index.js checkout main
-
-# Merge feature-login into main
-$ node index.js merge feature-login
-# Output: Merged branch 'feature-login' into 'main' successfully.
-```
-
-### 8. Push Local Commits to Cloudflare R2 Remote Storage
-```bash
-$ node index.js push
-# Output: All commits push to S3.
-```
-
-### 9. Pull Remote Commits from Cloud Storage
-```bash
-$ node index.js pull
-# Output: Downloads commit objects from R2 into .jhaGit/commits/
-```
-
-### 10. Clone Remote Repository
-```bash
-$ node index.js clone
-# Output: Initializes repo, pulls remote commits, and checks out latest snapshot to working directory
+# Check local working directory status
+node index.js status
 ```
 
 ---
 
-## Step 8: Issue Tracking
+## 4. Authentication & OTP Verification Flow
 
-Click the **"Issues"** tab in your repository to track bugs, tasks, and feature requests.
-
-### 1. Creating a New Issue
-Use the **New Issue** form on the right side of the Issues tab:
-
-#### Example Issue 1:
-- **Issue Title**: `Add dark mode toggle for code preview`
-- **Description**: `The code box should support syntax highlighting and theme customization for JavaScript and JSON files.`
-- Click **"Submit new issue"**.
-
-#### Example Issue 2:
-- **Issue Title**: `Update dependencies in package.json`
-- **Description**: `Ensure all backend packages are using the latest security patches.`
-- Click **"Submit new issue"**.
-
-The new issue will immediately appear in the **Repository Issues** list with a green `open` badge.
-
----
-
-## Step 9: Starring Repositories
-
-Starring repositories allows you to bookmark interesting projects and increase their popularity score:
-
-1. Click the **"☆ Star"** button on any repository card (on the Dashboard, Profile, or Repo Header).
-2. The button will change to a yellow **"★ Starred"** state, and the star count will increment instantly (e.g. from `0` to `1`).
-3. To view all projects you have starred, go to **Profile** (`/profile`) and click the **"Starred Repositories"** tab.
-
----
-
-## Step 10: User Profile & Contribution Heatmap
-
-Click **"Profile"** in the top Navbar or navigate to `/profile`.
-
-### Profile Features:
-1. **User Avatar & Bio**: Displays your avatar initial, username (`kunal_tester`), email, and developer bio.
-2. **Contribution Activity (Heatmap)**:
-   - A 12-month calendar grid (powered by `@uiw/react-heat-map`).
-   - Tracks repository creations (+3 points), issue submissions (+2 points), file commits (+1 point), and local CLI commits (+1 point).
-   - Shows your total annual contribution count.
-3. **Overview Tab**: Lists all repositories created and owned by you.
-4. **Starred Repositories Tab**: Lists all projects you have starred.
-5. **Account Settings Tab**:
-   - Update your registered email address.
-   - Update your password.
-   - Sign out of your current session.
-
----
-
-## Step 11: Repository Deletion (Owner Settings)
-
-If you are the owner of a repository, you can safely delete it:
-
-1. Open your repository (`/repo/:id`) and click the **"Settings"** tab.
-2. Locate the red **"Danger Zone"** box at the bottom.
-3. Click **"Delete this repository"**.
-4. An accessible confirmation modal (**ConfirmModal**) will pop up.
-5. To prevent accidental deletion, type the exact name of the repository (e.g. `demo-web-app`) into the text box.
-6. Once the name matches, click **"I understand, delete this repository"**.
-7. The repository, its files, issues, and star entries will be permanently deleted from the database, and you will be redirected to the Dashboard.
-
----
-
-## Step 12: Info Pages & Footer Navigation
-
-At the bottom of every page, a persistent footer provides direct links to project information:
-
-- **About Me** (`/about-me`): View developer bio for Kunal Kumar (IT Student at Haldia Institute of Technology), links to featured projects (*Nestify*, *Weather App*), and an online Resume link.
-- **About This Project** (`/about-project`): Technical breakdown of jhaGit's architecture, web dashboard features, CLI command list, and GitHub repository source code link (`https://github.com/kunaljha17/jhaGit.git`).
-- **Terms and Conditions** (`/terms`): Educational project disclaimer, trademark non-affiliation statement, and contact email.
-- **Contact Me 💬**: Click to open a direct WhatsApp chat with the developer in a new tab (`https://wa.me/918789625512`).
-
----
-
-## Summary of Example Data for Quick Reference
+jhaGit enforces a **secure 2-step email verification workflow** for user registration:
 
 ```
-User Account:
-  Email: kunal_tester@example.com
-  Password: SecurePass123!
-  Username: kunal_tester
-
-Repository:
-  Name: demo-web-app
-  Visibility: Public
-  Files: README.md, index.js, config.json
-
-Git Commands:
-  Init: node index.js init (or $ git init button)
-  Push: node index.js push (or $ git push button)
-  Pull: node index.js pull (or $ git pull button)
-
-Issue:
-  Title: Add dark mode toggle for code preview
-  Status: open
+[User Signup] ──> [Save User (isVerified: false)] ──> [Send 6-Digit OTP via SMTP]
+                                                               │
+                                                               v
+[JWT Token & Account Activation] <── [Verify OTP] <── [Enter OTP]
 ```
 
-Enjoy building and managing your code repositories with **jhaGit**!
+### Security Rules:
+- **Password Complexity**: Minimum 6 characters, max 30 characters, requiring at least **one uppercase letter**, **one digit**, and **one special character** (`@$!%*?&^#()_+-=[]{};':"|,.<>/?~``).
+- **OTP Hashing**: 6-digit random codes are hashed with **SHA-256** before saving to MongoDB (`user.otp`).
+- **Expiration & Rate Limiting**: OTPs expire after **10 minutes**. A minimum **60-second cooldown** is enforced between resend requests, with a maximum of **5 failed attempts**.
+
+---
+
+## 5. REST API Endpoint Reference
+
+All REST endpoints are exposed via `main.router.js` mounted at root `/`.
+
+### 5.1 User Management & Authentication
+
+| Method | Endpoint | Auth Required | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/signup` | No | Registers user & sends 6-digit OTP email |
+| `POST` | `/verify-otp` | No | Validates OTP, activates account (`isVerified: true`), returns JWT |
+| `POST` | `/resend-otp` | No | Resends OTP email if 60s cooldown period has elapsed |
+| `POST` | `/login` | No | Authenticates verified user, returns JWT & `userId` |
+| `GET` | `/allUsers` | No | Lists all registered users (passwords excluded) |
+| `GET` | `/userProfile/:id` | No | Fetches public user profile details |
+| `PUT` | `/updateProfile/:id` | **JWT** | Updates user email or password |
+| `PATCH` | `/user/avatar` | **JWT** | Updates avatar URL (selected from preset avatar set) |
+| `DELETE` | `/deleteProfile/:id` | **JWT** | Removes user profile from database |
+
+#### Example: Signup Request
+```http
+POST /signup HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "johndoe",
+  "email": "johndoe@example.com",
+  "password": "SecurePassword123!"
+}
+```
+
+#### Example: Verify OTP Request
+```http
+POST /verify-otp HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com",
+  "otp": "492015"
+}
+```
+
+---
+
+### 5.2 Repository & File Management
+
+| Method | Endpoint | Auth Required | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/repo/create` | **JWT** | Creates a new repository with initial `README.md` |
+| `GET` | `/repo/all` | No | Returns all public/accessible repositories |
+| `GET` | `/repo/:id` | No | Fetches single repository by MongoDB `ObjectId` |
+| `GET` | `/repo/name/:name` | No | Fetches repository by unique name |
+| `GET` | `/repo/user/:UserId` | No | Fetches all repositories owned by a specific user |
+| `PUT` | `/repo/update/:id` | **JWT** | Appends content or updates repo description |
+| `POST` | `/repo/file/add/:id` | **JWT** | Adds or updates in-browser file content |
+| `PATCH` | `/repo/toggle/:id` | **JWT** | Toggles repository visibility between Public & Private |
+| `DELETE` | `/repo/delete/:id` | **JWT** | Deletes repository (restricted to repo owner) |
+
+---
+
+### 5.3 Starring & Heatmap Activity
+
+| Method | Endpoint | Auth Required | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/repo/star/:id` | **JWT** | Stars a repository (idempotent increment) |
+| `POST` | `/repo/unstar/:id` | **JWT** | Unstars a repository |
+| `GET` | `/repo/starred/user/:userId` | No | Returns populated list of repositories starred by user |
+| `GET` | `/user/activity/:userId` | No | Generates 365-day contribution heatmap activity data |
+
+---
+
+### 5.4 Issue Tracking
+
+| Method | Endpoint | Auth Required | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/issue/create/:id` | **JWT** | Creates issue linked to repo `:id` |
+| `GET` | `/issue/all` | No | Fetches all issues for a repository |
+| `GET` | `/issue/:id` | No | Fetches single issue details by ID |
+| `PUT` | `/issue/update/:id` | **JWT** | Updates issue title, description, or status |
+| `DELETE` | `/issue/delete/:id` | **JWT** | Deletes an issue |
+
+---
+
+### 5.5 RESTful Git Engine Endpoints
+
+The backend allows web clients to invoke core Version Control actions over REST:
+
+| Method | Endpoint | Payload / Params | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/git/init` | None | Initializes `.jhaGit/` directory on server |
+| `POST` | `/git/add` | `{ "filePath": "file.txt" }` | Stages file to `.jhaGit/staging/` |
+| `POST` | `/git/commit` | `{ "message": "msg" }` | Snapshots staged files into `.jhaGit/commits/` |
+| `GET` | `/git/status` | None | Returns tracked, staged, and untracked file arrays |
+| `GET` | `/git/log` | None | Returns commit history array sorted chronologically |
+| `POST` | `/git/branch` | `{ "branchName": "feature" }` | Creates new branch or lists existing branches |
+| `POST` | `/git/checkout` | `{ "target": "main" }` | Switches active branch or commit |
+| `POST` | `/git/merge` | `{ "targetBranch": "dev" }` | Merges target branch into current branch |
+| `POST` | `/git/push` | None | Uploads local commits to Cloudflare R2 bucket |
+| `POST` | `/git/pull` | None | Syncs remote R2 commits down to local repository |
+| `POST` | `/git/revert` | `{ "commitID": "<hash>" }` | Restores files from commit to working tree |
+| `GET` | `/git/files` | None | Returns list of files & content for web file explorer |
+
+---
+
+## 6. CLI Engine Command Reference
+
+When working directly in the terminal, run commands via `node index.js <command>`:
+
+```bash
+# 1. Initialize Repository
+node index.js init
+
+# 2. Check Working Directory Status
+node index.js status
+
+# 3. Stage Files
+node index.js add index.js
+
+# 4. Commit Changes
+node index.js commit "Initial codebase commit"
+
+# 5. View Commit History
+node index.js log
+
+# 6. Branch Management
+node index.js branch feature-login    # Create branch
+node index.js branch                 # List branches
+
+# 7. Switch Branch or Commit
+node index.js checkout feature-login
+
+# 8. Merge Branch (True 3-Way LCS Merge)
+node index.js merge feature-login
+
+# 9. View File Differences
+node index.js diff index.js
+
+# 10. Remote Synchronization
+node index.js push                    # Upload to Cloudflare R2
+node index.js pull                    # Download from Cloudflare R2
+
+# 11. Clone Remote Repository
+node index.js clone
+
+# 12. Revert to Specific Commit
+node index.js revert <commitID>
+```
+
+---
+
+## 7. Git Engine Internals & Cloud Sync
+
+### Workspace Structure (`.jhaGit/`)
+
+```
+.jhaGit/
+├── HEAD              # Points to active branch (e.g. ref: refs/heads/main)
+├── MERGE_HEAD        # Persists secondary commit ID during merge conflicts
+├── config.json       # Repository metadata & settings
+├── staging/          # Staging area for files queued for commit
+├── commits/          # Commit object store
+│   └── <commitID>/
+│       ├── commit.json  # Metadata (message, date, parent, mergeParent)
+│       └── <files...>   # Exact snapshot copies of committed files
+└── refs/
+    └── heads/        # Branch pointer files (main, feature, etc.)
+```
+
+### 3-Way LCS Branch Merging (`controllers/merge.js`)
+1. **Lowest Common Ancestor (LCA)**: Traverses commit graph using BFS to find the common base commit between the current `HEAD` and `targetBranch`.
+2. **Dynamic Programming Line-by-Line LCS**: Compares Base, Head, and Target lines.
+3. **Conflict Detection**: If both HEAD and Target modify the same lines differently, conflict markers are written directly to the file:
+   ```text
+   <<<<<<< HEAD
+   Current branch changes
+   =======
+   Incoming target branch changes
+   >>>>>>> targetBranch
+   ```
+4. **MERGE_HEAD Tracking**: Saves the target commit ID in `.jhaGit/MERGE_HEAD` until resolved and committed, preserving multi-parent DAG commit history.
+
+---
+
+## 8. WebSocket Protocol (Socket.IO)
+
+The backend runs a Socket.IO server on top of the Node HTTP server with wildcard CORS enabled (`origin: "*"`).
+
+### Client Connection & Room Joining
+
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3002");
+
+// Join user-specific socket room for real-time alerts
+socket.emit("joinRoom", userId);
+```
+
+---
+
+## 9. Database Schemas & Data Models
+
+### User Schema (`models/userModel.js`)
+- `username`: String (Required, Unique, Trimmed)
+- `email`: String (Required, Unique, Lowercase)
+- `password`: String (Required, Hashed with bcrypt)
+- `avatar`: String (Preset URL string)
+- `isVerified`: Boolean (Default: `false`)
+- `otp`: String (SHA-256 Hashed 6-digit code)
+- `otpExpires`: Date
+- `otpAttempts`: Number
+- `otpLastSentAt`: Date
+- `starRepos`: Array of `ObjectId` references to `Repository`
+
+### Repository Schema (`models/repoModel.js`)
+- `name`: String (Required, Unique)
+- `description`: String
+- `visibility`: Boolean (Default: `true` for Public)
+- `Owner`: `ObjectId` reference to `User`
+- `content`: Array of objects `[{ name: String, content: String, updatedAt: Date }]`
+- `issues`: Array of `ObjectId` references to `Issue`
+- `starCount`: Number (Default: `0`)
+
+### Issue Schema (`models/issueModel.js`)
+- `title`: String (Required)
+- `description`: String (Required)
+- `status`: String (`open` | `closed`, Default: `open`)
+- `repository`: `ObjectId` reference to `Repository`
+- `author`: `ObjectId` reference to `User`
+- `createdAt`: Date
+
+---
+
+## 10. Test Suite Execution
+
+The backend contains dedicated automated test scripts:
+
+```bash
+# Test complete end-to-end CLI workflow (init, add, commit, branch, merge, revert)
+node test_playbook.js
+
+# Test deep multi-parent merge engine & conflict marker generation
+node test_merge_deep.js
+
+# Test complex graph ancestor discovery
+node test_merge_probe.js
+```
+
+---
+
+## 11. Troubleshooting & FAQs
+
+### Q1: `MONGODB_URI is not defined` Warning
+> Ensure `.env` is present in the `backend/` directory and contains a valid `MONGODB_URI`.
+
+### Q2: OTP Verification email fails to send
+> Check `SMTP_USER` and `SMTP_PASS` in `.env`. For Gmail, ensure you are using an **App Password** (16 characters) generated under Google Account Security settings.
+
+### Q3: Cloudflare R2 `push` or `pull` fails
+> Verify `R2_ENDPOINT`, `R2_ACCESS_KEY`, and `R2_SECRET_KEY` credentials in `.env`. Ensure your bucket name matches `R2_BUCKET`.
+
+### Q4: Port 3002 is already in use
+> Kill any existing Node process or specify a custom port in `.env`: `PORT=3003`.
