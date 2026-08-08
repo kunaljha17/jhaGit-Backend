@@ -1,37 +1,29 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Works with Gmail SMTP, Resend, Brevo, SendGrid SMTP relay, etc.
-// For Gmail: use an "App Password", not your normal password.
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,       // e.g. smtp.gmail.com
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_PORT === '465', // true for 465, false for 587
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  family: 4, // forces IPv4 — fixes ENETUNREACH on Render's network
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendOtpEmail(toEmail, otp) {
-  const html = `
-    <div style="font-family: sans-serif; max-width: 480px; margin: auto;">
-      <h2>jhaGit — Verify your email</h2>
-      <p>Use the code below to verify your account. It expires in 10 minutes.</p>
-      <div style="font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 20px 0;">
-        ${otp}
-      </div>
-      <p>If you didn't request this, you can safely ignore this email.</p>
-    </div>
-  `;
-
-  await transporter.sendMail({
-    from: `"jhaGit" <${process.env.SMTP_USER}>`,
-    to: toEmail,
+  const { data, error } = await resend.emails.send({
+    from: 'jhaGit <onboarding@resend.dev>', // swap to your own domain later, e.g. noreply@yourdomain.com
+    to: [toEmail],
     subject: 'Your jhaGit verification code',
-    html,
-    text: `Your jhaGit verification code is: ${otp} (expires in 10 minutes)`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2>Verify your jhaGit account</h2>
+        <p>Your verification code is:</p>
+        <p style="font-size: 28px; font-weight: bold; letter-spacing: 4px;">${otp}</p>
+        <p>This code expires shortly. If you didn't request this, you can ignore this email.</p>
+      </div>
+    `,
   });
+
+  if (error) {
+    console.error('Resend email failed:', error);
+    throw new Error(error.message || 'Failed to send OTP email');
+  }
+
+  console.log('OTP email sent via Resend:', data.id);
+  return data;
 }
 
 module.exports = { sendOtpEmail };
