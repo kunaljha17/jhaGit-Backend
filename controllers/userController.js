@@ -42,7 +42,6 @@ const signup = async (req, res) => {
     });
 
     if (existingUser) {
-      // If they exist but never verified, don't hard-block — let them re-request an OTP
       if (existingUser && !existingUser.isVerified) {
         return res.status(409).json({
           message:
@@ -72,16 +71,25 @@ const signup = async (req, res) => {
 
     await newUser.save();
 
-    await sendOtpEmail(newUser.email, otp);
+    // Account creation succeeded — from here on, email failure shouldn't 500 the whole request
+    try {
+      await sendOtpEmail(newUser.email, otp);
+    } catch (emailErr) {
+      console.error("OTP email failed to send:", emailErr.message);
+      return res.status(201).json({
+        message:
+          "Account created, but we couldn't send the verification email. Use /resend-otp to try again.",
+        userId: newUser._id,
+      });
+    }
 
-    // No JWT issued yet — user isn't verified, so they can't log in until they confirm the OTP
     res.status(201).json({
       message: "Signup successful. Check your email for the verification code.",
       userId: newUser._id,
     });
   } catch (err) {
     console.error("Error during signUp:", err.message);
-    res.status(500).send("Server error");
+    res.status(500).json({ message: "Server error" });
   }
 };
 
