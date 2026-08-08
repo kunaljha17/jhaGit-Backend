@@ -149,7 +149,7 @@ function startServer() {
 
   app.use(cors({
     origin: function (origin, callback) {
-      console.log("Incoming request origin:", origin);
+      // console.log("Incoming request origin:", origin);
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
