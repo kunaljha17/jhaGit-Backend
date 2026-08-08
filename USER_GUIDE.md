@@ -165,8 +165,8 @@ POST /signup HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "johndoe",
-  "email": "johndoe@example.com",
+  "username": "Kunaljha17",
+  "email": "jhakunal124@example.com",
   "password": "SecurePassword123!"
 }
 ```
@@ -177,7 +177,7 @@ POST /verify-otp HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "johndoe@example.com",
+  "email": "jhakunal124@example.com",
   "otp": "492015"
 }
 ```
