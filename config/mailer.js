@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendOtpEmail(toEmail, otp) {
   const { data, error } = await resend.emails.send({
-    from: 'jhaGit <onboarding@resend.dev>', // swap to your own domain later, e.g. noreply@yourdomain.com
+    from: 'jhaGit <noreply@kunalkj.dev>', // swap to your own domain later, e.g. noreply@yourdomain.com
     to: [toEmail],
     subject: 'Your jhaGit verification code',
     html: `
