@@ -144,7 +144,8 @@ function startServer() {
 
   const allowedOrigins = [
     "http://localhost:5173",              // local dev frontend
-    "https://jhagit.pages.dev",           // your Cloudflare Pages frontend (update if custom domain)
+    "https://jhagit.pages.dev",
+    "https://jhagit.kunalkj.dev",          
   ];
 
   app.use(cors({
