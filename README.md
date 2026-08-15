@@ -84,11 +84,8 @@ MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/GithubClone
 # JWT Authentication Secret
 JWT_SECRET=your_jwt_secret_key_here
 
-# Nodemailer / Email OTP Credentials
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_16_character_app_password
+# Resend API Key for Email OTP Verification
+RESEND_API_KEY=re_your_resend_api_key_here
 
 # Cloudflare R2 / S3 Storage Credentials
 R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
